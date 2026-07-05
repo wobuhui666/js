@@ -974,7 +974,7 @@ var rule = {
                     parse: 0,
                     url: bata.url,
                     jx: 0,
-                    danmaku: 'http://dm.4688888.xyz/?url=' + input.split("?")[0]
+                    danmaku: 'https://dmk.114514heihei.eu.org/?url=' + input.split("?")[0]
                 };
             } else {
                 input = {
@@ -984,7 +984,7 @@ var rule = {
                     parse: 0,
                     url: input.split("?")[0],
                     jx: 1,
-                    danmaku: 'http://dm.4688888.xyz/?url=' + input.split("?")[0]
+                    danmaku: 'https://dmk.114514heihei.eu.org/?url=' + input.split("?")[0]
                 };
             }
         } catch {
@@ -995,7 +995,7 @@ var rule = {
                 parse: 0,
                 url: input.split("?")[0],
                 jx: 1,
-                danmaku: 'http://dm.4688888.xyz/?url=' + input.split("?")[0]
+                danmaku: 'https://dmk.114514heihei.eu.org/?url=' + input.split("?")[0]
             };
         }
     }),

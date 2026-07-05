@@ -41,7 +41,7 @@ var rule = {
                     url: bata.url,
                     jx: 0,
                     header: headerx,
-                    danmaku: "http://dm.4688888.xyz/?url=" + input.split("?")[0]
+                    danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
                 };
             } else {
                 input = {
@@ -49,7 +49,7 @@ var rule = {
                     url: input.split("?")[0],
                     jx: 1,
                     header: headerx,
-                    danmaku: "http://dm.4688888.xyz/?url=" + input.split("?")[0]
+                    danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
                 };
             }
         } catch {
@@ -62,7 +62,7 @@ var rule = {
                 url: input.split("?")[0],
                 jx: 1,
                 header: headerx,
-                danmaku: "http://dm.4688888.xyz/?url=" + input.split("?")[0]
+                danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
             };
         }
     }),
