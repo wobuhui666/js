@@ -21,8 +21,62 @@ var rule = {
     play_parse:true,
     pagecount:{"1":1,"2":1,"3":1,"4":1,"5":1,"7":1,"时间表":1},
     lazy: $js.toString(() => {
+        let rawInput = "" + input;
+        let playUrl = rawInput.split("?")[0].replace(/\u2060/g, "").trim();
+        let headerx = {
+           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0',
+'Referer': 'https://www.bilibili.com',
+        };
+
+        function getBiliDanmaku(url) {
+            try {
+                let cid = "";
+                let idMatch = url.match(/_(\d+)$/);
+                if (idMatch) cid = idMatch[1];
+                if (!cid) {
+                    let epMatch = url.match(/\/bangumi\/play\/ep(\d+)/);
+                    if (epMatch) {
+                        let epId = epMatch[1];
+                        let html = fetch("https://api.bilibili.com/pgc/view/web/season?ep_id=" + epId, {
+                            method: 'get',
+                            headers: headerx
+                        });
+                        let jo = JSON.parse(html);
+                        let episodes = jo.result && jo.result.episodes ? jo.result.episodes : [];
+                        for (let i = 0; i < episodes.length; i++) {
+                            if (String(episodes[i].id) === epId || String(episodes[i].ep_id) === epId) {
+                                cid = episodes[i].cid;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!cid) {
+                    let bvMatch = url.match(/\/video\/(BV[^/?]+)/);
+                    let avMatch = url.match(/\/video\/av(\d+)/i);
+                    if (bvMatch || avMatch) {
+                        let pMatch = rawInput.match(/[?&]p=(\d+)/);
+                        let page = pMatch ? Math.max(parseInt(pMatch[1]), 1) : 1;
+                        let api = "https://api.bilibili.com/x/web-interface/view?" + (bvMatch ? "bvid=" + bvMatch[1] : "aid=" + avMatch[1]);
+                        let html = fetch(api, {
+                            method: 'get',
+                            headers: headerx
+                        });
+                        let jo = JSON.parse(html);
+                        let pages = jo.data && jo.data.pages ? jo.data.pages : [];
+                        if (pages[page - 1]) cid = pages[page - 1].cid;
+                    }
+                }
+                if (cid) return "https://comment.bilibili.com/" + cid + ".xml";
+            } catch (e) {
+                log("获取B站弹幕cid失败:" + e.message);
+            }
+            return "";
+        }
+
+        let danmakuUrl = getBiliDanmaku(playUrl) || ("https://dmk.114514heihei.eu.org/?url=" + encodeURIComponent(playUrl));
         try {
-            let api = "" + input.split("?")[0];
+            let api = playUrl;
             let response = fetch(api, {
                 method: 'get',
                 headers: {
@@ -41,15 +95,15 @@ var rule = {
                     url: bata.url,
                     jx: 0,
                     header: headerx,
-                    danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
+                    danmaku: danmakuUrl
                 };
             } else {
                 input = {
                     parse: 0,
-                    url: input.split("?")[0],
+                    url: playUrl,
                     jx: 1,
                     header: headerx,
-                    danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
+                    danmaku: danmakuUrl
                 };
             }
         } catch {
@@ -59,10 +113,10 @@ var rule = {
             };
             input = {
                 parse: 0,
-                url: input.split("?")[0],
+                url: playUrl,
                 jx: 1,
                 header: headerx,
-                danmaku: "https://dmk.114514heihei.eu.org/?url=" + input.split("?")[0]
+                danmaku: danmakuUrl
             };
         }
     }),
