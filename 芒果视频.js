@@ -25,6 +25,43 @@ var rule = {
         "115": getCommonFilter()
     },
     limit: 20,
+    推荐: $js.toString(() => {
+        let d = [];
+        let ids = {};
+        let channels = ["2", "3", "1", "50", "51", "115", "10"];
+
+        function getRemark(data) {
+            return data.updateInfo || (data.rightCorner && data.rightCorner.text) || (data.kind && data.kind.join("/")) || data.year || "";
+        }
+
+        function addItems(list) {
+            if (!list) return;
+            list.forEach(function(data) {
+                let id = data.playPartId || data.clipId || "";
+                let title = data.title || "";
+                if (!id || !title || ids[id]) return;
+                ids[id] = true;
+                d.push({
+                    vod_id: id,
+                    vod_name: title,
+                    vod_pic: data.img || data.imgUrlH || "",
+                    vod_remarks: getRemark(data)
+                });
+            });
+        }
+
+        channels.forEach(function(channelId) {
+            try {
+                let url = "https://pianku.api.mgtv.com/rider/list/pcweb/v3?platform=pcweb&channelId=" + channelId + "&pn=1&pc=8&hudong=1&_support=10000000&kind=a1&area=a1&year=all&sort=all&chargeInfo=all";
+                let json = JSON.parse(request(url));
+                addItems(json.data && json.data.hitDocs);
+            } catch (e) {
+                log("芒果推荐频道 " + channelId + " 获取失败:" + e.message);
+            }
+        });
+
+        VODS = d;
+    }),
     play_parse: true,
     lazy: $js.toString(() => {
         try {
